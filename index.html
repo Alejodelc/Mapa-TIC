@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Conceptual IA (mejorado)</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a2b3c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        /* TAMAÑO ESTÁNDAR PARA EXPORTAR - SIMILAR A UNA IMAGEN DE CANVA */
+        .canvas-export {
+            width: 1200px;          /* Ancho fijo para exportación */
+            min-height: 1600px;      /* Alto suficiente para todo el contenido */
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* HEADER GRANDE Y CLARO */
+        .header-export {
+            background: linear-gradient(135deg, #0a2647 0%, #1e3a6b 100%);
+            color: white;
+            padding: 30px 35px;
+            border-bottom: 8px solid #fdb750;
+        }
+
+        .titulo-ppal {
+            font-size: 42px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.2;
+        }
+
+        .subtitulo {
+            font-size: 28px;
+            font-weight: 400;
+            opacity: 0.95;
+            margin-top: 8px;
+        }
+
+        .info-estudiantes {
+            margin-top: 20px;
+            font-size: 24px;
+            display: flex;
+            gap: 40px;
+            background: rgba(255,255,255,0.1);
+            padding: 15px 25px;
+            border-radius: 60px;
+            width: fit-content;
+        }
+
+        .info-estudiantes i {
+            color: #fdb750;
+            margin-right: 10px;
+        }
+
+        /* CONTENEDOR PRINCIPAL DEL MAPA */
+        .contenido-mapa {
+            padding: 35px 35px 25px 35px;
+        }
+
+        /* GRID DE 4 COLUMNAS CON ESPACIADO JUSTO */
+        .grid-export {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* TARJETAS COMPACTAS PERO LEGIBLES */
+        .card-export {
+            background: #f9fcff;
+            border-radius: 25px;
+            padding: 20px 15px;
+            border: 2px solid #dbe8f5;
+            box-shadow: 0 8px 15px rgba(0,20,50,0.1);
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 26px;
+            font-weight: 700;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            border-bottom: 5px solid;
+        }
+
+        .card-header i {
+            font-size: 32px;
+        }
+
+        /* LISTAS DE ELEMENTOS - TEXTO GRANDE Y CLARO */
+        .lista-items {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .item {
+            background: white;
+            padding: 12px 12px;
+            border-radius: 16px;
+            font-size: 18px;
+            line-height: 1.4;
+            border-left: 8px solid;
+            box-shadow: 0 2px 5px #e0ecfa;
+            font-weight: 500;
+        }
+
+        .item i {
+            margin-right: 10px;
+            width: 24px;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+
+        /* COLORES DE BORDES POR CATEGORÍA */
+        .borde-verde { border-left-color: #27ae60; }
+        .borde-naranja { border-left-color: #e67e22; }
+        .borde-azul { border-left-color: #2980b9; }
+        .borde-morado { border-left-color: #9b59b6; }
+        .borde-dorado { border-left-color: #f39c12; }
+        .borde-rojo { border-left-color: #c0392b; }
+
+        .header-verde { border-bottom-color: #27ae60; }
+        .header-naranja { border-bottom-color: #e67e22; }
+        .header-azul { border-bottom-color: #2980b9; }
+        .header-morado { border-bottom-color: #9b59b6; }
+        .header-dorado { border-bottom-color: #f39c12; }
+        .header-rojo { border-bottom-color: #c0392b; }
+
+        /* TARJETA ESPECIAL DE DOBLE COLUMNA */
+        .card-doble {
+            grid-column: span 2;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            background: #edf4fe;
+            border: 3px solid #1e3a6b;
+        }
+
+        .divisor-columna {
+            border-right: 2px dashed #8aa9cc;
+            padding-right: 15px;
+        }
+
+        .badge-export {
+            background: #1e3a6b;
+            color: white;
+            padding: 6px 15px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        /* SECCIÓN DE REFERENCIAS - COMPACTA PERO COMPLETA */
+        .referencias-export {
+            background: #1e2e44;
+            color: #f0f5fd;
+            border-radius: 25px;
+            padding: 25px 25px;
+            margin-top: 20px;
+            border-left: 12px solid #fdb750;
+        }
+
+        .referencias-export h3 {
+            font-size: 32px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 3px solid #fdb750;
+            padding-bottom: 12px;
+        }
+
+        .ref-lista {
+            list-style: none;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .ref-lista li {
+            margin-bottom: 12px;
+            padding-left: 25px;
+            text-indent: -25px;
+        }
+
+        .ref-lista strong {
+            color: #fdb750;
+        }
+
+        .enlace-simulado {
+            color: #aac8f0;
+            text-decoration: underline;
+            word-break: break-all;
+        }
+
+        .nota-export {
+            margin-top: 15px;
+            font-size: 18px;
+            background: #00000030;
+            padding: 12px 18px;
+            border-radius: 40px;
+        }
+
+        hr {
+            border: 1px solid #bbd2ec;
+            margin: 15px 0;
+        }
+
+        /* GARANTIZAR QUE TODO SE VEA EN UNA HOJA */
+        .page-break {
+            page-break-after: avoid;
+            break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+    <div class="canvas-export">
+        <!-- HEADER CON NOMBRE INDIVIDUAL CORREGIDO -->
+        <div class="header-export">
+            <div class="titulo-ppal">🤖 ÉTICA DE LA INTELIGENCIA ARTIFICIAL</div>
+            <div class="subtitulo">en educación e investigación · mapa conceptual</div>
+            <div class="info-estudiantes">
+                <span><i class="fas fa-user"></i> Juan Carlos Muñoz Muñoz</span>
+                <span><i class="fas fa-graduation-cap"></i> I Lic. en Teología · 09/03/2026</span>
+            </div>
+        </div>
+
+        <!-- CONTENIDO PRINCIPAL DEL MAPA -->
+        <div class="contenido-mapa">
+            <!-- GRID DE 4 COLUMNAS VISIBLES A SIMPLE VISTA -->
+            <div class="grid-export">
+                <!-- PRINCIPIOS (ampliado con detalles de la UNESCO) -->
+                <div class="card-export">
+                    <div class="card-header header-verde">
+                        <i class="fas fa-scale-balanced" style="color:#27ae60;"></i> PRINCIPIOS
+                    </div>
+                    <div class="lista-items">
+                        <div class="item borde-verde"><i class="fas fa-heart"></i> Dignidad humana y derechos fundamentales (art. 13-14)</div>
+                        <div class="item borde-verde"><i class="fas fa-magnifying-glass"></i> Transparencia y explicabilidad (art. 37-41)</div>
+                        <div class="item borde-verde"><i class="fas fa-eye"></i> Supervisión humana (decisiones finales, art. 35-36)</div>
+                        <div class="item borde-verde"><i class="fas fa-venus-mars"></i> Igualdad de género / no discriminación (art. 28, 87-93)</div>
+                        <div class="item borde-verde"><i class="fas fa-leaf"></i> Protección del medio ambiente (art. 84-86)</div>
+                        <div class="item borde-verde"><i class="fas fa-shield-halved"></i> Proporcionalidad e inocuidad (art. 25-27)</div>
+                        <div class="item borde-verde"><i class="fas fa-balance-scale"></i> Equidad y justicia social (art. 28)</div>
+                        <div class="item borde-verde"><i class="fas fa-lock"></i> Privacidad y protección de datos (art. 32-34)</div>
+                        <div class="item borde-verde"><i class="fas fa-handcuffs"></i> Responsabilidad y rendición de cuentas (art. 42-43)</div>
+                        <div class="item borde-verde"><i class="fas fa-people-group"></i> Participación inclusiva (art. 46-47)</div>
+                        <span class="badge-export"><i class="far fa-file"></i> UNESCO 2022</span>
+                    </div>
+                </div>
+
+                <!-- DESAFÍOS (más específicos, basados en UNESCO y Viñas) -->
+                <div class="card-export">
+                    <div class="card-header header-naranja">
+                        <i class="fas fa-triangle-exclamation" style="color:#e67e22;"></i> DESAFÍOS
+                    </div>
+                    <div class="lista-items">
+                        <div class="item borde-naranja"><i class="fas fa-code-branch"></i> Sesgos algorítmicos y discriminación (raza, género, etc.)</div>
+                        <div class="item borde-naranja"><i class="fas fa-user-secret"></i> Pérdida de privacidad / vigilancia masiva</div>
+                        <div class="item borde-naranja"><i class="fas fa-brain"></i> Dependencia cognitiva y pérdida de autonomía</div>
+                        <div class="item borde-naranja"><i class="fas fa-wifi-slash"></i> Brecha digital y exclusión de grupos vulnerables</div>
+                        <div class="item borde-naranja"><i class="fas fa-newspaper"></i> Desinformación, discursos de odio y radicalización</div>
+                        <div class="item borde-naranja"><i class="fas fa-child"></i> Impacto emocional y cognitivo en niños y jóvenes</div>
+                        <div class="item borde-naranja"><i class="fas fa-briefcase"></i> Desplazamiento laboral y transformación de empleos</div>
+                        <div class="item borde-naranja"><i class="fas fa-globe"></i> Concentración de poder tecnológico en pocas empresas</div>
+                        <div class="item borde-naranja"><i class="fas fa-microchip"></i> Falta de explicabilidad (caja negra algorítmica)</div>
+                        <div class="item borde-naranja"><i class="fas fa-scale-balanced"></i> Dilemas éticos en decisiones automatizadas (ej. justicia, salud)</div>
+                    </div>
+                </div>
+
+                <!-- RECOMENDACIONES UNESCO (detalladas por ámbitos) -->
+                <div class="card-export">
+                    <div class="card-header header-azul">
+                        <i class="fas fa-clipboard-check" style="color:#2980b9;"></i> RECOMENDACIONES
+                    </div>
+                    <div class="lista-items">
+                        <div class="item borde-azul"><i class="fas fa-search"></i> Evaluación de impacto ético (ex ante y ex post, art. 50-53)</div>
+                        <div class="item borde-azul"><i class="fas fa-people-group"></i> Gobernanza multi-stakeholder (art. 54-60)</div>
+                        <div class="item borde-azul"><i class="fas fa-lock"></i> Protección de datos desde el diseño (art. 73-77)</div>
+                        <div class="item borde-azul"><i class="fas fa-handshake"></i> Cooperación internacional para reducir brechas (art. 78-83)</div>
+                        <div class="item borde-azul"><i class="fas fa-graduation-cap"></i> Alfabetización en IA y pensamiento crítico (art. 101-107)</div>
+                        <div class="item borde-azul"><i class="fas fa-ban"></i> Prohibir sistemas de puntuación social y vigilancia masiva (art. 26)</div>
+                        <div class="item borde-azul"><i class="fas fa-robot"></i> Supervisión humana en decisiones de alto riesgo (art. 36)</div>
+                        <div class="item borde-azul"><i class="fas fa-tree"></i> Evaluación de impacto ambiental de la IA (art. 84-86)</div>
+                        <div class="item borde-azul"><i class="fas fa-venus-mars"></i> Perspectiva de género en todo el ciclo de vida de la IA (art. 87-93)</div>
+                        <div class="item borde-azul"><i class="fas fa-copyright"></i> Protección de la diversidad cultural y lingüística (art. 94-100)</div>
+                    </div>
+                </div>
+
+                <!-- HERRAMIENTAS + VIDEO + OTRAS SUGERIDAS -->
+                <div class="card-export">
+                    <div class="card-header header-morado">
+                        <i class="fas fa-wrench" style="color:#9b59b6;"></i> HERRAMIENTAS
+                    </div>
+                    <div class="lista-items">
+                        <div class="item borde-morado"><i class="fab fa-canva"></i> Canva · infografías y mapas</div>
+                        <div class="item borde-morado"><i class="fas fa-palette"></i> Genially · interactivos y presentaciones</div>
+                        <div class="item borde-morado"><i class="fas fa-chart-pie"></i> Piktochart · visualización de datos</div>
+                        <div class="item borde-morado"><i class="fab fa-youtube"></i> Video "Inteligencia Artificial ¿Cómo educar para los retos del futuro?"</div>
+                        <div class="item borde-morado"><i class="fas fa-link"></i> Creative Commons · bancos de imágenes libres</div>
+                        <div class="item borde-morado"><i class="fas fa-search"></i> Google Académico, Dialnet, ERIC (búsqueda académica)</div>
+                        <div class="item borde-morado"><i class="fas fa-podcast"></i> SoundCloud, Audacity · podcasts educativos</div>
+                        <div class="item borde-morado"><i class="fas fa-video"></i> Jing, Camtasia · tutoriales en vídeo</div>
+                        <div class="item borde-morado"><i class="fas fa-comments"></i> Slack, Trello · trabajo colaborativo</div>
+                        <span class="badge-export">Guía Actividad N°1 + ebook Viñas</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TARJETA DOBLE: IA EN EDUCACIÓN E INVESTIGACIÓN (contenido ampliado) -->
+            <div style="margin: 25px 0;">
+                <div class="card-export card-doble">
+                    <!-- EDUCACIÓN (basado en UNESCO, Viñas, OVA) -->
+                    <div class="divisor-columna">
+                        <div class="card-header header-dorado" style="font-size:28px;">
+                            <i class="fas fa-chalkboard-user" style="color:#f39c12;"></i> EDUCACIÓN
+                        </div>
+                        <div class="lista-items">
+                            <div class="item borde-dorado"><i class="fas fa-robot"></i> Aprendizaje personalizado adaptativo (UNESCO art. 104)</div>
+                            <div class="item borde-dorado"><i class="fas fa-clock"></i> Automatización de tareas docentes (Viñas, p. 13)</div>
+                            <div class="item borde-dorado"><i class="fas fa-hand"></i> Riesgo: reducir capacidades cognitivas (UNESCO art. 104)</div>
+                            <div class="item borde-dorado"><i class="fas fa-children"></i> Personalización vs. privacidad del alumno (UNESCO art. 104)</div>
+                            <div class="item borde-dorado"><i class="fas fa-brain"></i> Fomentar pensamiento crítico y competencias digitales (Marquès, 2016)</div>
+                            <div class="item borde-dorado"><i class="fas fa-mobile-alt"></i> Uso de tabletas y apps educativas (Viñas, p. 32)</div>
+                            <div class="item borde-dorado"><i class="fas fa-school"></i> Creación de aulas virtuales (Moodle, Schoology, Edmodo) (Viñas, p. 30-31)</div>
+                            <div class="item borde-dorado"><i class="fas fa-newspaper"></i> Alfabetización mediática e informacional (UNESCO art. 114)</div>
+                        </div>
+                    </div>
+                    <!-- INVESTIGACIÓN (basado en UNESCO y OVA) -->
+                    <div>
+                        <div class="card-header header-dorado" style="font-size:28px;">
+                            <i class="fas fa-flask" style="color:#f39c12;"></i> INVESTIGACIÓN
+                        </div>
+                        <div class="lista-items">
+                            <div class="item borde-dorado"><i class="fas fa-database"></i> Análisis de grandes volúmenes de datos (UNESCO art. 110)</div>
+                            <div class="item borde-dorado"><i class="fas fa-microscope"></i> Nuevos enfoques metodológicos (simulación, modelado)</div>
+                            <div class="item borde-dorado"><i class="fas fa-exclamation-triangle"></i> Validación científica y sesgos en datos (UNESCO art. 111)</div>
+                            <div class="item borde-dorado"><i class="fas fa-file-signature"></i> Ética en la investigación con IA (consentimiento, privacidad, art. 108)</div>
+                            <div class="item borde-dorado"><i class="fas fa-flask"></i> Investigación interdisciplinaria (CTIM + ciencias sociales, art. 110)</div>
+                            <div class="item borde-dorado"><i class="fas fa-lock-open"></i> Acceso abierto a datos y publicaciones (UNESCO art. 109)</div>
+                            <div class="item borde-dorado"><i class="fas fa-hand-holding-heart"></i> Evaluación de impacto ético en proyectos de investigación (art. 50)</div>
+                            <div class="item borde-dorado"><i class="fas fa-code"></i> Reproducibilidad y transparencia algorítmica (art. 38-40)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REFERENCIAS APA COMPLETAS (7ª edición) -->
+            <div class="referencias-export">
+                <h3><i class="fas fa-book"></i> REFERENCIAS BIBLIOGRÁFICAS
+                <ul class="ref-lista">
+                    <li><strong>Cabero, J.</strong> (2018). <i>Las TIC en educación: posibilidades, limitaciones y riesgos</i>. Editorial Síntesis.</li>
+                    <li><strong>Facultad de Educación Universidad Mariana.</strong> (2026). <i>Guía de Actividad N° 1: Ética e inteligencia artificial</i>. [Documento institucional].</li>
+                    <li><strong>Marquès Graells, P.</strong> (2016). <i>Tecnologías para la educación. Una visión integral</i>. CissPraxis.</li>
+                    <li><strong>UNESCO.</strong> (2022). <i>Recomendación sobre la ética de la inteligencia artificial</i>. Organización de las Naciones Unidas para la Educación, la Ciencia y la Cultura. <span class="enlace-simulado">https://unesdoc.unesco.org/ark:/48223/pf0000381137_spa</span></li>
+                    <li><strong>Viñas, M.</strong> (2022). <i>10 competencias digitales y herramientas esenciales para transformar las clases y avanzar profesionalmente</i>. Academy TotemGuard.</li>
+                    <li><strong>O'Brien, J. A., & Marakas, G. M.</strong> (2019). <i>Introducción a los sistemas de información</i>. McGraw-Hill. (Citado en OVA)</li>
+                    <li><strong>Stallings, W.</strong> (2018). <i>Criptografía y seguridad de redes: principios y práctica</i>. Pearson. (Citado en OVA)</li>
+                </ul>
+                <div class="nota-export">
+                   
+                </div>
+                <div style="margin-top: 15px; font-size: 17px; background: #00000030; padding: 8px 18px; border-radius: 30px;">
+                   
+                </div>
+            </div>
+
+            <hr>
+            <div style="text-align: center; font-size: 18px; color: #1e3a6b; padding: 5px 0;">
+              
+            </div>
+        </div>
+    </div>
+</body>
+</html>
